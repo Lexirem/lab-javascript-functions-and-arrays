@@ -124,6 +124,21 @@ const wordsCount = [
   'disobedience',
   'matter'
 ];
+
+function howManyTimes (arr,wd){
+  if (arr.length ===0){
+    return 0;
+  } else{
+    let counter = 0;
+    arr.forEach(function(element){
+      if (element===wd){
+        counter++;
+      }
+    })
+    return counter;
+  }
+}
+
 // Iteration #8: Bonus
 const matrix = [
   [8, 2, 22, 97, 38, 15, 0, 40, 0, 75, 4, 5, 7, 78, 52, 12, 50, 77, 91, 8],
@@ -147,3 +162,112 @@ const matrix = [
   [20, 73, 35, 29, 78, 31, 90, 1, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57, 5, 54],
   [1, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52, 1, 89, 19, 67, 48]
 ];
+
+//Greates Product
+console.log("Greatest Product is " +greatestProduct(matrix).toLocaleString());
+
+function greatestProduct(matrix){
+  //Idea Conceptual:
+  //Para cada elemento de la matriz 'matrix' se calculara el producto de dicho elemento y los 3 de su derecha y los 3 de abajo.
+  //De los dos producto calcuados guardamos el maximo en 'cProd'.
+  //Se mira si el maximo calculado ('cProd') es mayor que el maximo encontrado hasta el momento ('maxProd') y de ser así se establece como nuevo máximo.
+  //Al final se devuelve el máximo hallado tras pasar por toda la matriz.
+  //Observaciones: No es necesario recorrer toda la matriz dado que los últimos elementos (de una hilera o columna) no se van a multiplicar por nada dado que no hay más valores.
+  //               Por dicho motivo los bucles 'for' llegan hasta 'numCols-3' y 'numRows-3'.
+
+  //Código:
+  let maxProd = 0;                                      //Variable en la que se guarda el mayor producto hallado a medida que avanza el programa.
+  let numRows = matrix.length;                          //Número de hileras que tiene la matriz.
+  let numCols = matrix[0].length;                       //Número de columnas que tiene la matriz.
+
+  for (i=0;i<numCols-3;i++){                            //Avanzamos dentro de una misma columna.
+    for (j=0;j<numRows-3;j++){                          //Avanzamos dentro de una misma hilera.
+      let cProd = currentProd(i,j,matrix,maxProd);      //Calcuar el producto del elemento matrix[i][j] por los 3 elementos de su derecha y 3 de abajo (y guardamos el mayor de los dos en 'cProd').
+      if (maxProd<cProd){                               //Se mira si el producto recien calculado('cProd') es mayor que el maximo hallado hasta el momento ('maxProd'). 
+        maxProd = cProd;                                //Si se cumple lo de arriba, el producto mayor allado hasta el momento ('maxProd') para a ser el recien calculado ('cProd').
+      }
+    }
+  }
+  return maxProd;                                       //Devolvemos el producto mayor hallado hasta el momento ('maxProd').
+}
+function currentProd(row,column,matrix,currMax){
+  //Idea conceptual:
+  //Partiendo del elemento 'matrix[row][column]' calcular 2 cosas:
+  //   - Producto de los 4 elementos hacia la derecha ('rowProd').
+  //   - Producto de los 4 elementos hacia abajo ('colProd')
+  //Devolver el mayor de los dos productos calculados (mayor de 'rowProd' y 'colProd').
+
+  //Código:
+  let rowProd = matrix[row][column] *  matrix[row][column+1] * matrix[row][column+2] * matrix[row][column+3];       //Multiplica los elementos en vertical
+  let colProd = matrix[row][column] *  matrix[row+1][column] * matrix[row+2][column] * matrix[row+3][column];       //Multiplica los elementos en horizontal
+  //Si se 'descomenta' la siguiente linea se puede ver el recorrido del programa por toda la matriz y los calculos intermetios.
+  // console.log( "Row: " + row +" | Column: " + column +" | Horizontal Prod: " + rowProd+" | Vertical Prod: " + colProd + " | CurrMaxProd: "+Math.max(rowProd, colProd)+" | CurrMax: " + currMax );
+  return Math.max(rowProd, colProd);                                                                                //Devuelve el mayor de los dos productos
+}
+
+//Greates Product in Diagonal
+console.log("Greatest Product in Diagonal is " + greatestProductDiag(matrix).toLocaleString());
+
+function greatestProductDiag(matrix){
+  let maxProdDiag = 0;                                              //Variable en la que se guarda el mayor producto hallado a medida que avanza el programa.
+  let numRows = matrix.length;                                      //Número de hileras que tiene la matriz.
+  let numCols = matrix[0].length;                                   //Número de columnas que tiene la matriz.
+
+  for (i=0;i<numCols;i++){                                          //Avanzamos dentro de una misma columna.
+    for (j=0;j<numRows;j++){                                        //Avanzamos dentro de una misma hilera.
+      let cProdDiag = currentMultiply(i,j,matrix,maxProdDiag);      //Calcuar el producto del elemento matrix[i][j] por los 3 elementos de abajo-derecha y 3 de abajo-izquierda (y guardamos el mayor de los dos en 'cProdDiag').
+      if (maxProdDiag<cProdDiag){                                   //Se mira si el producto recien calculado('cProdDiag') es mayor que el maximo hallado hasta el momento ('maxProdDiag').
+        maxProdDiag = cProdDiag;                                    //Si se cumple lo de arriba, el producto mayor allado hasta el momento ('maxProdDiag') para a ser el recien calculado ('cProdDiag').
+      }
+    }
+  }
+  return maxProdDiag;                                               //Devolvemos el producto mayor hallado hasta el momento ('maxProdDiag').
+}
+function currentMultiply(row,column,matrix,currMax){
+  //Idea Conceptual:
+  //Partiendo del elemento 'matrix[row][column]' calcular 2 cosas:
+  //   - Producto de los 4 elementos de la diagonal hacia la derecha y abajo ('rowProd').
+  //   - Producto de los 4 elementos de la diagonal hacia la izquierda y abajo  ('colProd')
+  //Devolver el mayor de los dos productos calculados (mayor de 'rowProd' y 'colProd').
+  //Observaciones: Si el elemento actual se encuentra cerca de una esquina de la matriz (como por ejemplo en 'matrix[0][0]'), 
+  //               la diagonal hacia abajo y la izquierda intentaria acceder al elemento 'matrix[-1][-1]' y eso daria un error.
+  //               Para solucionarlo se hace un paso intermedio y se guardaran los 6 elementos a multiplicar (3 de una diagonal y 3 de la otra)
+  //               en la array 'valores'. Si intenta acceder a un elemento imposible como 'matrix[-1][-1]' hará como si ese elemento fuera '1',
+  //               de este modo no se altera el producto calculado, si no es un elemento imposible lo guardara en la array 'valores'.
+
+  //Código:
+  let numRows = matrix.length;                  //Número de hileras que tiene la matriz.
+  let numCols = matrix[0].length;               //Número de columnas que tiene la matriz.
+
+  let valores=[0,0,0,0,0,0];                    //Aqui se guardan los elementos a multiplicar.
+                                                //Los tres primeros son lo de la diagonal abajo y derecha.
+                                                //Los tres primeros son lo de la diagonal abajo e izquierda.
+
+  // Se guardan los elementos de las diagonales en la array 'valores'.
+  // Los try-catch hacen que si se intenta acceder a un elemento impossible como 'matrix[-1][-1]' guarde un '1' en la array 'valores'.
+  // El 'for' se utiliza para recorrer las diagonales desde el elemento inicial 'matrix[row][column]' dado que la variable 'i' va creciendo.
+  // Por ejemplo si estamos en la posición 'matrix[10][10]', guardará :
+  //      - matriz[11][11], matriz[12][12], matriz[13][13]
+  //      - matriz[11][9],  matriz[11][8],  matriz[11][7]
+  // en la aray de valores.
+  for (let i = 1;i<=3;i++){
+    try{if(matrix[row+i][column+i]===undefined){valores[i-1]=1;}else{valores[i-1]=matrix[row+i][column+i];}}catch{valores[i-1]=1;}
+    try{if(matrix[row+i][column-i]===undefined){valores[i+2]=1;}else{valores[i+2]=matrix[row+i][column-i];}}catch{valores[i+2]=1;}
+  }
+
+  let prod1=matrix[row][column] *  valores[0] * valores[1] * valores[2];    //Se calcula el producto de la diagonal abajo y derecha.
+  let prod2=matrix[row][column] *  valores[3] * valores[4] * valores[5];    //Se calcula el producto de la diagonal abajo e izquierda.
+
+  //Comprovación del Proceso:
+
+  //Si se 'descomenta' la siguiente linea se puede ver los elementos de las diagonales que va a multiplicar.
+  // console.log("Diagonal Abajo-Izquierda: " +matrix[row][column]+ " x "+ valores[0] +" x " + valores[1] +" x " + valores[2] + " = " + prod1.toLocaleString() +" | Diagonal Abajo-Derecha: " +matrix[row][column]+ " x "+ valores[3] +" x " + valores[4] +" x " + valores[5] + " = " + prod2.toLocaleString() );
+  
+  //Si se 'descomenta' la siguiente linea se puede ver el recorrido del programa por toda la matriz y los calculos intermetios, así como los tipos de datos.
+  // console.log("NumRows: " + numRows +"(" +typeof numRows +") | NumCols: " + numCols +"(" +typeof numCols +") | CurRow: " + row +"(" +typeof row +") | CurColumn: " + column +"("+ typeof column +") | Prod DR: " + prod1+"("+ typeof prod1 + ") | Product DL: " + prod2 + "("+ typeof prod2 +") | CurrMaxProd: "+Math.max(prod1,prod2)+ "(" + typeof Math.max(prod1,prod2) + ") | CurrMax: " + currMax + " ("+ typeof currMax + ")");
+  
+  //Si se 'descomenta' la siguiente linea se puede ver el recorrido del programa por toda la matriz y los calculos intermetios.
+  // console.log("NumRows: " + numRows +" | NumCols: " + numCols +" | Row: " + row +" | Column: " + column +" | Prod DR: " + prod1+" | Product DL: " + prod2 + " | CurrMaxProd: "+Math.max(prod1,prod2)+" | CurrMax: " + currMax );
+  
+  return Math.max(prod1,prod2);             //Devolvemos el mayor de los dos productos.
+}
